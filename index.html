@@ -101,7 +101,6 @@ canvas{
   pointer-events:none;
   z-index:0;
 }
-
 </style>
 </head>
 
@@ -127,9 +126,11 @@ canvas{
 </div>
 
 <canvas id="fireworks"></canvas>
+
 <audio id="boom">
   <source src="boom.mp3" type="audio/mpeg">
 </audio>
+
 <script>
 /* =======================
    💕 BUTTON LOGIC
@@ -168,7 +169,7 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 const boom = document.getElementById("boom");
-boom.volume = 0.6;
+if (boom) boom.volume = 0.6;
 
 let rockets = [];
 let particles = [];
@@ -192,7 +193,6 @@ function launchRocket(){
   });
 }
 
-/* 💥 BIG CIRCULAR FIREWORK EXPLOSION */
 function explodeFirework(x, y){
   const colors = [
     "#ff1744", "#ff9100", "#ffea00",
@@ -219,7 +219,6 @@ function explodeFirework(x, y){
 function animate(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  /* rockets */
   rockets.forEach((r,i)=>{
     r.y -= r.speed;
     ctx.fillStyle = r.color;
@@ -228,18 +227,19 @@ function animate(){
     ctx.fill();
 
     if(r.y < canvas.height * 0.3){
-      boom.currentTime = 0;
-      boom.play();               // 🎆 BOOM
+      if (boom) {
+        boom.currentTime = 0;
+        boom.play().catch(() => {});
+      }
       explodeFirework(r.x, r.y);
       rockets.splice(i, 1);
     }
   });
 
-  /* particles */
   particles.forEach((p,i)=>{
     p.x += p.vx;
     p.y += p.vy;
-    p.vy += 0.05;        // gravity
+    p.vy += 0.05;
     p.life--;
 
     ctx.globalAlpha = p.life / 90;
@@ -264,7 +264,3 @@ onresize = () => {
 
 </body>
 </html>
-
-
-
-
