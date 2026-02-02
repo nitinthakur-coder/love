@@ -35,10 +35,7 @@ body{
   max-width:500px;
 }
 
-h1{
-  color:#e91e63;
-  font-size:36px;
-}
+h1{ color:#e91e63; font-size:36px; }
 
 .question{
   font-size:30px;
@@ -132,135 +129,123 @@ canvas{
 </audio>
 
 <script>
-/* =======================
-   💕 BUTTON LOGIC
-   ======================= */
-const noBtn = document.getElementById("no");
-const yesBtn = document.getElementById("yes");
-const msg = document.getElementById("msg");
-const final = document.getElementById("final");
+document.addEventListener("DOMContentLoaded", () => {
 
-let started = false;
+  const noBtn = document.getElementById("no");
+  const yesBtn = document.getElementById("yes");
+  const msg = document.getElementById("msg");
+  const final = document.getElementById("final");
+  const canvas = document.getElementById("fireworks");
+  const ctx = canvas.getContext("2d");
+  const boom = document.getElementById("boom");
 
-/* teasing no button */
-const texts = [
-  "Are you sure? 🤨",
-  "Really sure? 🥺",
-  "Nah… not happening 😌",
-  "Nice try 😏",
-  "Just click YES already 💕"
-];
-let ti = 0;
-
-function moveNo(){
-  noBtn.style.transform =
-    `translate(${Math.random()*300-150}px,${Math.random()*100-50}px)`;
-  msg.textContent = texts[ti++ % texts.length];
-}
-noBtn.addEventListener("mouseenter", moveNo);
-noBtn.addEventListener("click", moveNo);
-
-/* =======================
-   🎆 FIREWORKS
-   ======================= */
-const canvas = document.getElementById("fireworks");
-const ctx = canvas.getContext("2d");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
-
-const boom = document.getElementById("boom");
-if (boom) boom.volume = 0.6;
-
-let rockets = [];
-let particles = [];
-
-yesBtn.addEventListener("click", () => {
-  if (started) return;
-  started = true;
-
-  msg.textContent = "";
-  final.style.display = "block";
-
-  setInterval(launchRocket, 900);
-});
-
-function launchRocket(){
-  rockets.push({
-    x: Math.random() * canvas.width,
-    y: canvas.height,
-    speed: Math.random() * 4 + 6,
-    color: `hsl(${Math.random()*360},100%,60%)`
-  });
-}
-
-function explodeFirework(x, y){
-  const colors = [
-    "#ff1744", "#ff9100", "#ffea00",
-    "#00e5ff", "#2979ff", "#d500f9",
-    "#00e676", "#ffffff"
-  ];
-
-  for(let i = 0; i < 120; i++){
-    const angle = Math.random() * Math.PI * 2;
-    const speed = Math.random() * 7 + 3;
-
-    particles.push({
-      x,
-      y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      life: 90,
-      color: colors[Math.floor(Math.random()*colors.length)],
-      size: Math.random() * 3 + 2
-    });
-  }
-}
-
-function animate(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  rockets.forEach((r,i)=>{
-    r.y -= r.speed;
-    ctx.fillStyle = r.color;
-    ctx.beginPath();
-    ctx.arc(r.x, r.y, 4, 0, Math.PI*2);
-    ctx.fill();
-
-    if(r.y < canvas.height * 0.3){
-      if (boom) {
-        boom.currentTime = 0;
-        boom.play().catch(() => {});
-      }
-      explodeFirework(r.x, r.y);
-      rockets.splice(i, 1);
-    }
-  });
-
-  particles.forEach((p,i)=>{
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.05;
-    p.life--;
-
-    ctx.globalAlpha = p.life / 90;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-    ctx.fillStyle = p.color;
-    ctx.fill();
-
-    if(p.life <= 0) particles.splice(i,1);
-  });
-
-  ctx.globalAlpha = 1;
-  requestAnimationFrame(animate);
-}
-animate();
-
-onresize = () => {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
-};
+  if (boom) boom.volume = 0.6;
+
+  let started = false;
+  let rockets = [];
+  let particles = [];
+
+  const texts = [
+    "Are you sure? 🤨",
+    "Really sure? 🥺",
+    "Nah… not happening 😌",
+    "Nice try 😏",
+    "Just click YES already 💕"
+  ];
+  let ti = 0;
+
+  function moveNo(){
+    noBtn.style.transform =
+      `translate(${Math.random()*300-150}px,${Math.random()*100-50}px)`;
+    msg.textContent = texts[ti++ % texts.length];
+  }
+  noBtn.addEventListener("mouseenter", moveNo);
+  noBtn.addEventListener("click", moveNo);
+
+  yesBtn.addEventListener("click", () => {
+    if (started) return;
+    started = true;
+
+    msg.textContent = "";
+    final.style.display = "block";
+    setInterval(launchRocket, 900);
+  });
+
+  function launchRocket(){
+    rockets.push({
+      x: Math.random() * canvas.width,
+      y: canvas.height,
+      speed: Math.random() * 4 + 6,
+      color: `hsl(${Math.random()*360},100%,60%)`
+    });
+  }
+
+  function explodeFirework(x, y){
+    const colors = ["#ff1744","#ff9100","#ffea00","#00e5ff","#2979ff","#d500f9","#00e676","#fff"];
+    for(let i=0;i<120;i++){
+      const a = Math.random()*Math.PI*2;
+      const s = Math.random()*7+3;
+      particles.push({
+        x,y,
+        vx:Math.cos(a)*s,
+        vy:Math.sin(a)*s,
+        life:90,
+        color:colors[Math.floor(Math.random()*colors.length)],
+        size:Math.random()*3+2
+      });
+    }
+  }
+
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    rockets.forEach((r,i)=>{
+      r.y -= r.speed;
+      ctx.fillStyle=r.color;
+      ctx.beginPath();
+      ctx.arc(r.x,r.y,4,0,Math.PI*2);
+      ctx.fill();
+
+      if(r.y < canvas.height*0.3){
+        if(boom){
+          boom.currentTime=0;
+          boom.play().catch(()=>{});
+        }
+        explodeFirework(r.x,r.y);
+        rockets.splice(i,1);
+      }
+    });
+
+    particles.forEach((p,i)=>{
+      p.x+=p.vx;
+      p.y+=p.vy;
+      p.vy+=0.05;
+      p.life--;
+
+      ctx.globalAlpha=p.life/90;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fillStyle=p.color;
+      ctx.fill();
+
+      if(p.life<=0) particles.splice(i,1);
+    });
+
+    ctx.globalAlpha=1;
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  onresize=()=>{
+    canvas.width=innerWidth;
+    canvas.height=innerHeight;
+  };
+
+});
 </script>
 
 </body>
 </html>
+
